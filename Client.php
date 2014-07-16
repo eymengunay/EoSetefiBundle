@@ -80,7 +80,7 @@ class Client
      * @param  PaymentRequestInterface $paymentRequest
      * @return string
      */
-    public function sendConfirm($paymentId, PaymentRequestInterface $paymentRequest)
+    public function confirm($paymentId, PaymentRequestInterface $paymentRequest)
     {
         $client = new Guzzle();
 

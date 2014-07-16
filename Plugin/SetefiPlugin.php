@@ -109,7 +109,7 @@ class SetefiPlugin extends AbstractPlugin
         }
 
         $paymentRequest = $this->createPaymentRequest($transaction, $data);
-        $response = $this->client->sendConfirm($data->get('payment_id'), $paymentRequest);
+        $response = $this->client->confirm($data->get('payment_id'), $paymentRequest);
 
         $data->set('result', $response['result']);
         $data->set('authorizationcode', $response['authorizationcode']);
