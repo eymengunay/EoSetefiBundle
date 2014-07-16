@@ -74,6 +74,38 @@ class Client
     }
 
     /**
+     * Send cancel request
+     *
+     * @param  string $paymentId
+     * @return string
+     */
+    public function cancel($paymentId)
+    {
+        $client = new Guzzle();
+
+        $parameters = array(
+            'id' => $this->id,
+            'password' => $this->password,
+            'operationType' => 'voidauthorization',
+            'paymentId' => $paymentId
+        );
+
+        $request  = $client->post($this->endpoint, array(), $parameters);
+        $response = $request->send();
+        $response = new \SimpleXMLElement($response->getBody());
+        
+        return array(
+            'result' => strval($response->result),
+            'authorizationcode' => strval($response->authorizationcode),
+            'paymentid' => strval($response->paymentid),
+            'merchantorderid' => strval($response->merchantorderid),
+            'responsecode' => strval($response->responsecode),
+            'customfield' => strval($response->customfield),
+            'description' => strval($response->description)
+        );
+    }
+
+    /**
      * Send confirm request
      *
      * @param  string                  $paymentId

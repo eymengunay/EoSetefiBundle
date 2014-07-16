@@ -101,6 +101,20 @@ class SetefiPlugin extends AbstractPlugin
     /**
      * {@inheritdoc}
      */
+    public function reverseApproval(FinancialTransactionInterface $transaction, $retry)
+    {
+        $data = $transaction->getExtendedData();
+        if ($data->has('payment_id') === false) {
+            throw new \RuntimeException('No payment_id found');
+        }
+
+        $response = $this->client->cancel($data->get('payment_id'));
+        $transaction->setResponseCode(PluginInterface::RESPONSE_CODE_SUCCESS);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function deposit(FinancialTransactionInterface $transaction, $retry)
     {
         $data = $transaction->getExtendedData();
