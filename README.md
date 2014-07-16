@@ -3,7 +3,7 @@
 [![Total Downloads](https://poser.pugx.org/eo/setefi-bundle/downloads.png)](https://packagist.org/packages/eo/setefi-bundle)
 [![Latest Stable Version](https://poser.pugx.org/eo/setefi-bundle/v/stable.png)](https://packagist.org/packages/eo/setefi-bundle)
 
-Setefi provider for JMSPaymentCoreBundle
+Setefi provider for [JMSPaymentCoreBundle](https://github.com/schmittjoh/JMSPaymentCoreBundle)
 
 ## Documentation
 
