@@ -61,5 +61,11 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->request->getDescription(), null);
         $this->request->setDescription('Hello world');
         $this->assertEquals($this->request->getDescription(), 'Hello world');
+
+        // Return url
+        $this->assertEquals($this->request->getReturnUrl(), 'http://example.com/completed');
+
+        // Recovery url
+        $this->assertEquals($this->request->getRecoveryUrl(), 'http://example.com/canceled');
     }
 }

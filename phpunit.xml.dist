@@ -23,15 +23,13 @@
         </testsuite>
     </testsuites>
 
-    <groups>
-        <exclude>
-            <group>benchmark</group>
-        </exclude>
-    </groups>
-
     <filter>
         <blacklist>
             <directory>vendor/*</directory>
         </blacklist>
     </filter>
+
+    <logging>
+        <log type="coverage-html" target="./report" charset="UTF-8"/>
+    </logging>
 </phpunit>
