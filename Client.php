@@ -74,10 +74,47 @@ class Client
     }
 
     /**
+     * Send confirm request
+     *
+     * @param  string                  $paymentId
+     * @param  PaymentRequestInterface $paymentRequest
+     * @return string
+     */
+    public function sendConfirm($paymentId, PaymentRequestInterface $paymentRequest)
+    {
+        $client = new Guzzle();
+
+        $parameters = array(
+            'id' => $this->id,
+            'password' => $this->password,
+            'operationType' => 'confirm',
+            'amount' => $paymentRequest->getAmount(),
+            'currencyCode' => $paymentRequest->getCurrencyCode(),
+            'merchantOrderId' => $paymentRequest->getCartId(),
+            'description' => $paymentRequest->getDescription(),
+            'paymentid' => $paymentId
+        );
+
+        $request  = $client->post($this->endpoint, array(), $parameters);
+        $response = $request->send();
+        $response = new \SimpleXMLElement($response->getBody());
+        
+        return array(
+            'result' => strval($response->result),
+            'authorizationcode' => strval($response->authorizationcode),
+            'paymentid' => strval($response->paymentid),
+            'merchantorderid' => strval($response->merchantorderid),
+            'responsecode' => strval($response->responsecode),
+            'customfield' => strval($response->customfield),
+            'description' => strval($response->description),
+        );
+    }
+
+    /**
      * Resolve notification parameters
      *
-     * @param  array    $parameters
-     * @return Response
+     * @param  array $parameters
+     * @return array
      */
     public function resolveNotification($parameters)
     {

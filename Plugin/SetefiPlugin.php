@@ -65,12 +65,14 @@ class SetefiPlugin extends AbstractPlugin
     }
 
     /**
-     * {@inheritdoc}
+     * Create payment request
+     * 
+     * @param  FinancialTransactionInterface $transaction
+     * @param  ExtendedDataInterface         $data
+     * @return PaymentRequest
      */
-    public function approveAndDeposit(FinancialTransactionInterface $transaction, $retry)
+    public function createPaymentRequest(FinancialTransactionInterface $transaction, ExtendedDataInterface $data)
     {
-        $data = $transaction->getExtendedData();
-
         $paymentRequest = new PaymentRequest(
             $transaction->getRequestedAmount(),
             $this->getCartId($data),
@@ -84,6 +86,49 @@ class SetefiPlugin extends AbstractPlugin
         if ($email = $this->getEmail($data)) {
             $paymentRequest->setEmail($email);
         }
+
+        return $paymentRequest;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function approve(FinancialTransactionInterface $transaction, $retry)
+    {
+        return $this->approveAndDeposit($transaction, $retry);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deposit(FinancialTransactionInterface $transaction, $retry)
+    {
+        $data = $transaction->getExtendedData();
+        if ($data->has('payment_id') === false) {
+            throw new \RuntimeException('No payment_id found');
+        }
+
+        $paymentRequest = $this->createPaymentRequest($transaction, $data);
+        $response = $this->client->sendConfirm($data->get('payment_id'), $paymentRequest);
+
+        $data->set('result', $response['result']);
+        $data->set('authorizationcode', $response['authorizationcode']);
+        $data->set('responsecode', $response['responsecode']);
+        $data->set('merchantorderid', $response['merchantorderid']);
+
+        $transaction->setReferenceNumber($data->get('payment_id'));
+        $transaction->setProcessedAmount($paymentRequest->getAmount());
+        $transaction->setResponseCode(PluginInterface::RESPONSE_CODE_SUCCESS);
+        $transaction->setReasonCode(PluginInterface::REASON_CODE_SUCCESS);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function approveAndDeposit(FinancialTransactionInterface $transaction, $retry)
+    {
+        $data = $transaction->getExtendedData();
+        $paymentRequest = $this->createPaymentRequest($transaction, $data);
 
         // Redirect new transactions to payment page
         if ($transaction->getState() === FinancialTransactionInterface::STATE_NEW) {
