@@ -75,23 +75,30 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test resolve notification
+     *
+     * @expectedException \Exception
+     */
+    public function testResolveNotificationException()
+    {
+        $parameters = array(
+            "authorizationcode" => "fakews",
+            "cardcountry"       => "ITALY",
+            "cardexpirydate"    => "0718"
+        );
+        $this->client->resolveNotification($parameters);
+    }
+
+    /**
      * Test payment url
      */
     public function testConfirm()
     {
         $code = uniqid();
-        $paymentRequest = new PaymentRequest(50, $code, 'http://eymen.ngrok.com/test.php', 'http://example.com/canceled');
+        $paymentRequest = new PaymentRequest(50, $code, 'http://example.com/completed', 'http://example.com/canceled');
         $paymentRequest->setFullName('John Doe');
         $paymentRequest->setEmail('john@doe.com');
-        $data = $this->client->sendConfirm(1234, $paymentRequest);
-        
-            print_r($data);
-        die;
-        $contents = file_get_contents($url);
-        $this->assertNotEquals(strpos($contents, '<td id="amount">EUR 50,00</td>'), false);
-        $this->assertNotEquals(strpos($contents, '<td id="trackid">'.$code.'</td>'), false);
-        $this->assertNotEquals(strpos($contents, 'name="member" value="John Doe"'), false);
-        $this->assertNotEquals(strpos($contents, 'name="cardHolderEmail" value="john@doe.com"'), false);
+        $this->client->confirm(1234, $paymentRequest);
     }
 
     /**

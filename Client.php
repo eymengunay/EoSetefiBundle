@@ -11,8 +11,6 @@ namespace Eo\SetefiBundle;
 use Eo\SetefiBundle\Payment\PaymentRequestInterface;
 use Guzzle\Http\Client as Guzzle;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Setefi client
@@ -150,8 +148,7 @@ class Client
      */
     public function resolveNotification($parameters)
     {
-        $resolver = new OptionsResolver();
-        $resolver->setRequired(array(
+        $required = array(
             "authorizationcode",
             "cardcountry",
             "cardexpirydate",
@@ -164,9 +161,19 @@ class Client
             "rrn",
             "securitytoken",
             "threedsecure"
-        ));
+        );
 
-        return $resolver->resolve($parameters);
+        $missing = array();
+        foreach ($required as $key) {
+            if (array_key_exists($key, $parameters) === false) {
+                $missing[] = $key;
+            }
+        }
+        if (empty($missing) === false) {
+            throw new \Exception('Required fields are missing: ' . implode(', ', $missing));
+        }
+
+        return $parameters;
     }
 
     /**
